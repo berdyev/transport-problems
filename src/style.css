@@ -1,0 +1,165 @@
+/* ═══════════════════════════════════════════════════════════
+   Транспортные задачи — Глобальные стили
+   ═══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --bg-main: #0d0f1a;
+  --bg-card: #13162a;
+  --bg-card2: #181c30;
+  --bg-input: #1e2238;
+  --border: rgba(255,255,255,0.08);
+  --border-glow: rgba(99,179,237,0.3);
+
+  --accent: #63b3ed;
+  --accent2: #7f5af0;
+  --accent3: #2cb67d;
+  --accent-nw: #f6ad55;
+  --accent-vogel: #9f7aea;
+  --accent-pot: #63b3ed;
+  --accent-result: #2cb67d;
+
+  --text-primary: #e8ecf4;
+  --text-secondary: #8896b3;
+  --text-dim: #555e7a;
+
+  --shadow-glow: 0 0 40px rgba(99,179,237,0.12);
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.4);
+  --radius: 16px;
+  --radius-sm: 10px;
+
+  --phase-nw: #f6ad55;
+  --phase-vogel: #9f7aea;
+  --phase-pot: #63b3ed;
+  --phase-result: #2cb67d;
+  --phase-balance: #a0aec0;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-main);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── Scrollbar ─────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* ─── Buttons ───────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px;
+  border: none; border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent2), var(--accent));
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(127,90,240,0.35);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(127,90,240,0.5);
+}
+
+.btn-secondary {
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  padding: 6px 14px;
+  font-size: 13px;
+}
+.btn-ghost:hover { color: var(--text-primary); border-color: rgba(255,255,255,0.2); }
+
+.btn-danger {
+  background: rgba(245,101,101,0.15);
+  color: #fc8181;
+  border: 1px solid rgba(245,101,101,0.25);
+  padding: 6px 12px; font-size: 13px;
+}
+.btn-danger:hover { background: rgba(245,101,101,0.25); }
+
+/* ─── Card ──────────────────────────────────────────────── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+}
+
+/* ─── Input ─────────────────────────────────────────────── */
+.input-num {
+  width: 100%; padding: 8px 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-family: inherit; font-size: 14px;
+  text-align: center;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  -moz-appearance: textfield;
+}
+.input-num::-webkit-outer-spin-button,
+.input-num::-webkit-inner-spin-button { -webkit-appearance: none; }
+.input-num:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(99,179,237,0.15);
+}
+
+/* ─── Badge ─────────────────────────────────────────────── */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.5px; text-transform: uppercase;
+}
+.badge-blue  { background: rgba(99,179,237,0.15); color: var(--accent); }
+.badge-green { background: rgba(44,182,125,0.15); color: var(--accent3); }
+.badge-purple{ background: rgba(127,90,240,0.15); color: var(--accent2); }
+.badge-amber { background: rgba(246,173,85,0.15); color: var(--accent-nw); }
+
+/* ─── Utilities ─────────────────────────────────────────── */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.gap-4 { gap: 16px; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.mt-4 { margin-top: 16px; }
+
+/* ─── Fade transition ───────────────────────────────────── */
+.fade-enter-active, .fade-leave-active { transition: opacity 0.3s, transform 0.3s; }
+.fade-enter-from { opacity: 0; transform: translateY(8px); }
+.fade-leave-to  { opacity: 0; transform: translateY(-8px); }
+
+.slide-enter-active, .slide-leave-active { transition: all 0.25s ease; }
+.slide-enter-from { opacity: 0; transform: translateX(16px); }
+.slide-leave-to  { opacity: 0; transform: translateX(-16px); }
