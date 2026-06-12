@@ -4,6 +4,7 @@
  */
 
 import type { TspStep, TspSolution } from './types'
+import { currentLocale } from '../locale'
 
 const INF = Infinity
 
@@ -96,6 +97,7 @@ function findSubCycleBlock(
  * Основной пошаговый решатель задачи коммивояжера
  */
 export function solveTsp(initialMatrix: number[][]): TspSolution {
+  const isTkm = currentLocale.value === 'tkm'
   const n = initialMatrix.length
 
   // 1. Находим оптимальное решение перебором для верификации и построения траектории
@@ -109,8 +111,8 @@ export function solveTsp(initialMatrix: number[][]): TspSolution {
       steps: [
         {
           stepIndex: 0,
-          title: 'Ошибка решения',
-          description: 'Не удалось найти допустимый гамильтонов цикл. Проверьте веса рёбер.',
+          title: isTkm ? 'Çözgüt ýalňyşlygy' : 'Ошибка решения',
+          description: isTkm ? 'Rugsat edilen Gamilton siklini tapyp bolmady. Gyralaryň agramlaryny barlap görüň.' : 'Не удалось найти допустимый гамильтонов цикл. Проверьте веса рёбер.',
           matrix: cloneMatrix(initialMatrix),
           crossedRows: [],
           crossedCols: [],
@@ -176,12 +178,10 @@ export function solveTsp(initialMatrix: number[][]): TspSolution {
 
   steps.push({
     stepIndex: 0,
-    title: 'Начальная редукция матрицы',
-    description:
-      `Вычитаем минимальные элементы строк и столбцов.\n` +
-      `Вычтенные минимумы по строкам: [${rowMins.join(', ')}].\n` +
-      `Вычтенные минимумы по столбцам: [${colMins.join(', ')}].\n` +
-      `Начальная нижняя оценка стоимости пути H₀ = ${lowerBound}.`,
+    title: isTkm ? 'Matrisanyň başlangyç reduksiýasy' : 'Начальная редукция матрицы',
+    description: isTkm
+      ? `Hatarlaryň we sütünleriň iň kiçi elementlerini aýyrýarys.\nHatarlar boýunça aýyrylan minimumlar: [${rowMins.join(', ')}].\nSütünler boýunça aýyrylan minimumlar: [${colMins.join(', ')}].\nÝoluň bahasynyň başlangyç aşaky bahasy H₀ = ${lowerBound}.`
+      : `Вычитаем минимальные элементы строк и столбцов.\nВычтенные минимумы по строкам: [${rowMins.join(', ')}].\nВычтенные минимумы по столбцам: [${colMins.join(', ')}].\nНачальная нижняя оценка стоимости пути H₀ = ${lowerBound}.`,
     matrix: cloneMatrix(currentMatrix),
     crossedRows: [...crossedRows],
     crossedCols: [...crossedCols],
@@ -206,10 +206,10 @@ export function solveTsp(initialMatrix: number[][]): TspSolution {
 
       steps.push({
         stepIndex: steps.length,
-        title: `Завершение маршрута: ребро (${lastI + 1} → ${lastJ + 1})`,
-        description:
-          `Остался последний свободный переход из города ${lastI + 1} в город ${lastJ + 1}.\n` +
-          `Добавляем его в маршрут. Маршрут полностью сформирован.`,
+        title: isTkm ? `Ugryň tamamlanmagy: (${lastI + 1} → ${lastJ + 1}) gyrasy` : `Завершение маршрута: ребро (${lastI + 1} → ${lastJ + 1})`,
+        description: isTkm
+          ? `${lastI + 1} şäherinden ${lastJ + 1} şäherine iň soňky boş geçiş galdy.\nOny ugra goşýarys. Ugur doly emele geldi.`
+          : `Остался последний свободный переход из города ${lastI + 1} в город ${lastJ + 1}.\nДобавляем его в маршрут. Маршрут полностью сформирован.`,
         matrix: cloneMatrix(currentMatrix),
         crossedRows: [...crossedRows],
         crossedCols: [...crossedCols],
@@ -273,18 +273,26 @@ export function solveTsp(initialMatrix: number[][]): TspSolution {
     currentPath.push({ i: selI, j: selJ })
 
     // Описание перед редукцией
-    let desc = `Оцениваем все нулевые ячейки. Сумма вторых минимумов в строке и столбце для нуля дает штраф за его неиспользование.\n`
+    let desc = isTkm 
+      ? `Ähli nol öýjükleri bahalandyrýarys. Noluň ulanylmazlygy üçin jerime hatardaky we sütündäki ikinji minimumlaryň jemidir.\n`
+      : `Оцениваем все нулевые ячейки. Сумма вторых минимумов в строке и столбце для нуля дает штраф за его неиспользование.\n`
     if (bestZero) {
-      desc += `Максимальный штраф имеет ячейка (${bestZero.i + 1} → ${bestZero.j + 1}) со значением ${maxPenalty}.\n`
+      desc += isTkm 
+        ? `Iň uly jerime ${maxPenalty} bahasy bilen (${bestZero.i + 1} → ${bestZero.j + 1}) öýjügindedir.\n`
+        : `Максимальный штраф имеет ячейка (${bestZero.i + 1} → ${bestZero.j + 1}) со значением ${maxPenalty}.\n`
     }
-    desc += `Для продолжения оптимального пути выбираем ребро (${selI + 1} → ${selJ + 1}) со штрафом ${selPenalty}.\n`
+    desc += isTkm
+      ? `Iň oňat ýoly dowam etdirmek üçin ${selPenalty} jerimeli (${selI + 1} → ${selJ + 1}) gyrasyny saýlaýarys.\n`
+      : `Для продолжения оптимального пути выбираем ребро (${selI + 1} → ${selJ + 1}) со штрафом ${selPenalty}.\n`
 
     // Блокируем подцикл
     const blockEdge = findSubCycleBlock(currentPath.slice(0, -1), n, selI, selJ)
     let blockText = ''
     if (blockEdge) {
       currentMatrix[blockEdge.i][blockEdge.j] = INF
-      blockText = `Для предотвращения преждевременного замыкания цикла блокируем обратный путь (${blockEdge.i + 1} → ${blockEdge.j + 1}) (присваиваем весу ∞).\n`
+      blockText = isTkm
+        ? `Sikliň wagtyndan öň ýapylmagynyň öňünü almak üçin (${blockEdge.i + 1} → ${blockEdge.j + 1}) yza gaýdýan ýoly bekleyäris (agramyna ∞ berýäris).\n`
+        : `Для предотвращения преждевременного замыкания цикла блокируем обратный путь (${blockEdge.i + 1} → ${blockEdge.j + 1}) (присваиваем весу ∞).\n`
     }
 
     // Вычеркиваем строку selI и столбец selJ
@@ -338,15 +346,15 @@ export function solveTsp(initialMatrix: number[][]): TspSolution {
 
     steps.push({
       stepIndex: steps.length,
-      title: `Шаг ${stepNum}: Выбор ребра (${selI + 1} → ${selJ + 1})`,
+      title: isTkm ? `Ädim ${stepNum}: (${selI + 1} → ${selJ + 1}) gyrasyny saýlamak` : `Шаг ${stepNum}: Выбор ребра (${selI + 1} → ${selJ + 1})`,
       description:
         desc +
         blockText +
-        `Вычеркиваем строку ${selI + 1} и столбец ${selJ + 1}.\n` +
+        (isTkm ? `${selI + 1} hataryny we ${selJ + 1} sütüni çyzýarys.\n` : `Вычеркиваем строку ${selI + 1} и столбец ${selJ + 1}.\n`) +
         (stepReduction > 0
-          ? `Проводим редукцию остатка матрицы. Сумма новых вычтенных констант: ${stepReduction}.\n`
-          : 'Редукция остатка матрицы не потребовалась.\n') +
-        `Текущая нижняя граница стоимости: H = ${lowerBound}.`,
+          ? (isTkm ? `Galan matrisa reduksiýa geçirýäris. Täze aýyrylan hemişelikleriň jemi: ${stepReduction}.\n` : `Проводим редукцию остатка матрицы. Сумма новых вычтенных констант: ${stepReduction}.\n`)
+          : (isTkm ? 'Galan matrisanyň reduksiýasy gerek bolmady.\n' : 'Редукция остатка матрицы не потребовалась.\n')) +
+        (isTkm ? `Häzirki bahasynyň aşaky çägi: H = ${lowerBound}.` : `Текущая нижняя граница стоимости: H = ${lowerBound}.`),
       matrix: cloneMatrix(currentMatrix),
       crossedRows: [...crossedRows],
       crossedCols: [...crossedCols],
@@ -362,10 +370,10 @@ export function solveTsp(initialMatrix: number[][]): TspSolution {
   // Финальный шаг: Результат
   steps.push({
     stepIndex: steps.length,
-    title: 'Результат решения',
-    description:
-      `Построен оптимальный обход: ${opt.path.map(x => x + 1).join(' → ')}.\n` +
-      `Длина маршрута (минимальная суммарная стоимость): ${opt.cost}.`,
+    title: isTkm ? 'Çözgüdiň netijesi' : 'Результат решения',
+    description: isTkm
+      ? `Iň oňat aýlaw gurlupdyr: ${opt.path.map(x => x + 1).join(' → ')}.\nUgryň uzynlygy (iň az umumy baha): ${opt.cost}.`
+      : `Построен оптимальный обход: ${opt.path.map(x => x + 1).join(' → ')}.\nДлина маршрута (минимальная суммарная стоимость): ${opt.cost}.`,
     matrix: cloneMatrix(initialMatrix),
     crossedRows: Array.from({ length: n }, (_, i) => i),
     crossedCols: Array.from({ length: n }, (_, i) => i),

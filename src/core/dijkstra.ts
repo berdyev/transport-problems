@@ -1,6 +1,7 @@
 /**
  * Алгоритм Дейкстры — поиск кратчайшего пути в сети
  */
+import { currentLocale } from '../locale'
 
 export interface GraphNode {
   id: number
@@ -61,6 +62,7 @@ export function dijkstra(
   sourceId: number,
   directed: boolean
 ): DijkstraResult {
+  const isTkm = currentLocale.value === 'tkm'
   const n = nodes.length
   const ids = nodes.map(nd => nd.id)
 
@@ -93,10 +95,10 @@ export function dijkstra(
     previous: [...prev],
     visited: [],
     queue: [...ids],
-    title: 'Инициализация',
-    description:
-      `Источник: вершина ${labelOf(sourceId)}. Устанавливаем d(${labelOf(sourceId)})=0, все остальные = ∞.\n` +
-      `Очередь: {${ids.map(labelOf).join(', ')}}`,
+    title: isTkm ? 'Başlangyçlama' : 'Инициализация',
+    description: isTkm
+      ? `Çeşme: ${labelOf(sourceId)} düwüni. d(${labelOf(sourceId)})=0 belleýäris, beýlekileri = ∞.\nNobat: {${ids.map(labelOf).join(', ')}}`
+      : `Источник: вершина ${labelOf(sourceId)}. Устанавливаем d(${labelOf(sourceId)})=0, все остальные = ∞.\nОчередь: {${ids.map(labelOf).join(', ')}}`,
   })
 
   // Основной цикл
@@ -120,10 +122,10 @@ export function dijkstra(
         previous: [...prev],
         visited: [...visited],
         queue: ids.filter(id => !visited.has(id)),
-        title: 'Алгоритм завершён',
+        title: isTkm ? 'Algoritm tamamlandy' : 'Алгоритм завершён',
         description: unreachable.length > 0
-          ? `Вершины ${unreachable.join(', ')} недостижимы из источника.`
-          : 'Все вершины обработаны. Кратчайшие пути найдены!',
+          ? (isTkm ? `${unreachable.map(labelOf).join(', ')} düwünlerine çeşmeden ýetip bolmaýar.` : `Вершины ${unreachable.join(', ')} недостижимы из источника.`)
+          : (isTkm ? 'Ähli düwünler işlenildi. Iň gysga ýollar tapyldy!' : 'Все вершины обработаны. Кратчайшие пути найдены!'),
       })
       break
     }
@@ -136,10 +138,10 @@ export function dijkstra(
       previous: [...prev],
       visited: [...visited],
       queue,
-      title: `Выбираем вершину ${labelOf(uId)}`,
-      description:
-        `Из непосещённых {${queue.map(labelOf).join(', ')}} выбираем вершину с минимальным d = ${dist[uId]}: ` +
-        `вершина ${labelOf(uId)}. Помечаем как посещённую.`,
+      title: isTkm ? `${labelOf(uId)} düwünini saýlaýarys` : `Выбираем вершину ${labelOf(uId)}`,
+      description: isTkm
+        ? `Geçilmedik {${queue.map(labelOf).join(', ')}} arasyndan iň az d = ${dist[uId]} bolan düwüni saýlaýarys: ${labelOf(uId)} düwüni. Geçilen diýip belleýäris.`
+        : `Из непосещённых {${queue.map(labelOf).join(', ')}} выбираем вершину с минимальным d = ${dist[uId]}: вершина ${labelOf(uId)}. Помечаем как посещённую.`,
     })
 
     visited.add(uId)
@@ -156,8 +158,8 @@ export function dijkstra(
           visited: [...visited],
           queue: ids.filter(id => !visited.has(id)),
           relaxed: { from: uId, to, oldDist: dist[to], newDist: dist[to] },
-          title: `Ребро (${labelOf(uId)} → ${labelOf(to)}) пропущено`,
-          description: `Вершина ${labelOf(to)} уже посещена — пропускаем.`,
+          title: isTkm ? `(${labelOf(uId)} → ${labelOf(to)}) gyrasy geçildi` : `Ребро (${labelOf(uId)} → ${labelOf(to)}) пропущено`,
+          description: isTkm ? `${labelOf(to)} düwüni eýýäm geçilen — geçýäris.` : `Вершина ${labelOf(to)} уже посещена — пропускаем.`,
         })
         continue
       }
@@ -175,11 +177,10 @@ export function dijkstra(
           visited: [...visited],
           queue: ids.filter(id => !visited.has(id)),
           relaxed: { from: uId, to, oldDist: old, newDist },
-          title: `Релаксация: ребро (${labelOf(uId)} → ${labelOf(to)})`,
-          description:
-            `d(${labelOf(uId)}) + w(${labelOf(uId)},${labelOf(to)}) = ${dist[uId]} + ${weight} = ${newDist} ` +
-            `< d(${labelOf(to)}) = ${distLabel(old)}.\n` +
-            `Обновляем: d(${labelOf(to)}) = ${newDist}, предшественник = ${labelOf(uId)}.`,
+          title: isTkm ? `Relaksasiýa: (${labelOf(uId)} → ${labelOf(to)}) gyrasy` : `Релаксация: ребро (${labelOf(uId)} → ${labelOf(to)})`,
+          description: isTkm
+            ? `d(${labelOf(uId)}) + w(${labelOf(uId)},${labelOf(to)}) = ${dist[uId]} + ${weight} = ${newDist} < d(${labelOf(to)}) = ${distLabel(old)}.\nTäzeleýäris: d(${labelOf(to)}) = ${newDist}, öňki = ${labelOf(uId)}.`
+            : `d(${labelOf(uId)}) + w(${labelOf(uId)},${labelOf(to)}) = ${dist[uId]} + ${weight} = ${newDist} < d(${labelOf(to)}) = ${distLabel(old)}.\nОбновляем: d(${labelOf(to)}) = ${newDist}, предшественник = ${labelOf(uId)}.`,
         })
       } else {
         steps.push({
@@ -190,10 +191,10 @@ export function dijkstra(
           visited: [...visited],
           queue: ids.filter(id => !visited.has(id)),
           relaxed: { from: uId, to, oldDist: dist[to], newDist },
-          title: `Ребро (${labelOf(uId)} → ${labelOf(to)}) — не улучшает`,
-          description:
-            `d(${labelOf(uId)}) + w = ${dist[uId]} + ${weight} = ${newDist} ` +
-            `≥ d(${labelOf(to)}) = ${distLabel(dist[to])}. Обновление не требуется.`,
+          title: isTkm ? `(${labelOf(uId)} → ${labelOf(to)}) gyrasy — gowulandyrmaýar` : `Ребро (${labelOf(uId)} → ${labelOf(to)}) — не улучшает`,
+          description: isTkm
+            ? `d(${labelOf(uId)}) + w = ${dist[uId]} + ${weight} = ${newDist} ≥ d(${labelOf(to)}) = ${distLabel(dist[to])}. Täzelemek gerek däl.`
+            : `d(${labelOf(uId)}) + w = ${dist[uId]} + ${weight} = ${newDist} ≥ d(${labelOf(to)}) = ${distLabel(dist[to])}. Обновление не требуется.`,
         })
       }
     }
@@ -208,8 +209,8 @@ export function dijkstra(
       previous: [...prev],
       visited: [...visited],
       queue: [],
-      title: '✅ Кратчайшие пути найдены',
-      description: `Все вершины обработаны.\n${summary}`,
+      title: isTkm ? '✅ Iň gysga ýollar tapyldy' : '✅ Кратчайшие пути найдены',
+      description: isTkm ? `Ähli düwünler işlenildi.\n${summary}` : `Все вершины обработаны.\n${summary}`,
     })
   }
 

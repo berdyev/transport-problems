@@ -3,6 +3,7 @@
  * методом последовательного нахождения кратчайших путей (Successive Shortest Path)
  * с использованием алгоритма SPFA (Shortest Path Faster Algorithm) для остаточной сети.
  */
+import { currentLocale } from '../locale'
 
 export interface McfNode {
   id: number
@@ -61,6 +62,7 @@ export function solveMinCostMaxFlow(
   nodes: McfNode[],
   edges: McfEdge[]
 ): McfSolution {
+  const isTkm = currentLocale.value === 'tkm'
   const steps: McfStep[] = []
   
   // 1. Проверим баланс сети
@@ -159,9 +161,10 @@ export function solveMinCostMaxFlow(
   // Добавим начальный шаг
   steps.push({
     stepIndex: stepCount++,
-    title: 'Инициализация остаточной сети',
-    description: `Суммарное производство источников: ${supplySum}. Суммарная потребность стоков: ${demandSum}.\n` +
-      `Созданы фиктивный источник S и фиктивный сток T для сведения задачи к классической задаче о максимальном потоке.`,
+    title: isTkm ? 'Galyndy torun başlanmagy' : 'Инициализация остаточной сети',
+    description: isTkm
+      ? `Çeşmeleriň umumy önümçiligi: ${supplySum}. Sarp edişleriň umumy islegi: ${demandSum}.\nMeseläni klassiki iň uly akym meselesine getirmek üçin galp çeşme S we galp sarp ediş T döredildi.`
+      : `Суммарное производство источников: ${supplySum}. Суммарная потребность стоков: ${demandSum}.\nСозданы фиктивный источник S и фиктивный сток T для сведения задачи к классической задаче о максимальном потоке.`,
     flows: Object.fromEntries(solvedEdges.map(e => [e.id, 0])),
     path: null,
     pathFlow: 0,
@@ -259,11 +262,12 @@ export function solveMinCostMaxFlow(
 
     steps.push({
       stepIndex: stepCount++,
-      title: `Шаг ${stepCount - 1}: Пуск потока по пути ${labelsPath.join(' → ')}`,
-      description: `Найден кратчайший дополняющий путь стоимостью ${dist[T]} за единицу.\n` +
-        `Величина добавленного потока: ${pathFlow}.\n` +
-        `Путь прохождения: ${labelsPath.join(' → ')}.\n` +
-        `Стоимость этого шага: ${pathFlow} * ${dist[T]} = ${pathFlow * dist[T]}.`,
+      title: isTkm 
+        ? `Ädim ${stepCount - 1}: ${labelsPath.join(' → ')} ugry boýunça akymy goýbermek` 
+        : `Шаг ${stepCount - 1}: Пуск потока по пути ${labelsPath.join(' → ')}`,
+      description: isTkm
+        ? `Birlik üçin ${dist[T]} bahaly iň gysga üsti ýetiriji ýol tapyldy.\nGoşulan akymyň mukdary: ${pathFlow}.\nGeçiş ugry: ${labelsPath.join(' → ')}.\nBu ädimiň bahasy: ${pathFlow} * ${dist[T]} = ${pathFlow * dist[T]}.`
+        : `Найден кратчайший дополняющий путь стоимостью ${dist[T]} за единицу.\nВеличина добавленного потока: ${pathFlow}.\nПуть прохождения: ${labelsPath.join(' → ')}.\nСтоимость этого шага: ${pathFlow} * ${dist[T]} = ${pathFlow * dist[T]}.`,
       flows: Object.fromEntries(solvedEdges.map(e => [e.id, e.flow ?? 0])),
       path: pathNodes.filter(id => id !== S && id !== T), // оставляем только реальные вершины для подсветки
       pathFlow,
@@ -274,10 +278,10 @@ export function solveMinCostMaxFlow(
   // Финальный шаг
   steps.push({
     stepIndex: stepCount++,
-    title: 'Решение завершено',
-    description: `Оптимальный поток успешно распределен!\n` +
-      `Общий перевезенный объем: ${totalFlow}.\n` +
-      `Минимальная суммарная стоимость (расход): ${totalCost}.`,
+    title: isTkm ? 'Çözgüt tamamlandy' : 'Решение завершено',
+    description: isTkm
+      ? `Iň oňat akym üstünlikli paýlandy!\nUmumy daşalan mukdar: ${totalFlow}.\nIň az umumy baha (çykdajy): ${totalCost}.`
+      : `Оптимальный поток успешно распределен!\nОбщий перевезенный объем: ${totalFlow}.\nМинимальная суммарная стоимость (расход): ${totalCost}.`,
     flows: Object.fromEntries(solvedEdges.map(e => [e.id, e.flow ?? 0])),
     path: null,
     pathFlow: 0,

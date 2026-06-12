@@ -6,6 +6,7 @@
  */
 
 import type { TransportProblem, TransportSolution, SolveStep } from './types'
+import { currentLocale } from '../locale'
 
 const INF = 1e9
 
@@ -41,11 +42,12 @@ function balance(
   const totalSupply = sumArr(supply)
   const totalDemand = sumArr(demand)
 
+  const isTkm = currentLocale.value === 'tkm'
   if (totalSupply === totalDemand) {
     steps.push({
       phase: 'balance',
-      title: 'Проверка баланса',
-      description: `Задача сбалансирована: суммарные запасы = суммарные потребности = ${totalSupply}`,
+      title: isTkm ? 'Deňagramlylygy barlamak' : 'Проверка баланса',
+      description: isTkm ? `Meselä deňagramly: umumy ätiýaçlyklar = umumy islegler = ${totalSupply}` : `Задача сбалансирована: суммарные запасы = суммарные потребности = ${totalSupply}`,
     })
     return { supply: [...supply], demand: [...demand], costs: deepCopy(costs), fictitious: false }
   }
@@ -57,9 +59,10 @@ function balance(
     const idx = demand.length
     steps.push({
       phase: 'balance',
-      title: 'Балансировка задачи',
-      description: `Запасы (${totalSupply}) > Потребности (${totalDemand}). ` +
-        `Добавляем фиктивный магазин М${idx + 1} с потребностью ${diff} и нулевой стоимостью перевозки.`,
+      title: isTkm ? 'Meseläni deňagramlaşdyrmak' : 'Балансировка задачи',
+      description: isTkm
+        ? `Ätiýaçlyklar (${totalSupply}) > Islegler (${totalDemand}). ${diff} islegli we nolinji daşamak bahasy bolan galp D${idx + 1} dükanyny goşýarys.`
+        : `Запасы (${totalSupply}) > Потребности (${totalDemand}). Добавляем фиктивный магазин М${idx + 1} с потребностью ${diff} и нулевой стоимостью перевозки.`,
     })
     return { supply: [...supply], demand: newDemand, costs: newCosts, fictitious: true, fictitiousType: 'consumer', fictitiousIndex: idx }
   } else {
@@ -69,9 +72,10 @@ function balance(
     const idx = supply.length
     steps.push({
       phase: 'balance',
-      title: 'Балансировка задачи',
-      description: `Потребности (${totalDemand}) > Запасы (${totalSupply}). ` +
-        `Добавляем фиктивный склад С${idx + 1} с запасом ${diff} и нулевой стоимостью перевозки.`,
+      title: isTkm ? 'Meseläni deňagramlaşdyrmak' : 'Балансировка задачи',
+      description: isTkm
+        ? `Islegler (${totalDemand}) > Ätiýaçlyklar (${totalSupply}). ${diff} ätiýaçlykly we nolinji daşamak bahasy bolan galp A${idx + 1} ammaryny goşýarys.`
+        : `Потребности (${totalDemand}) > Запасы (${totalSupply}). Добавляем фиктивный склад С${idx + 1} с запасом ${diff} и нулевой стоимостью перевозки.`,
     })
     return { supply: newSupply, demand: [...demand], costs: newCosts, fictitious: true, fictitiousType: 'supplier', fictitiousIndex: idx }
   }
@@ -90,11 +94,13 @@ export function northWestCorner(
   const s = [...supply]
   const d = [...demand]
 
+  const isTkm = currentLocale.value === 'tkm'
   steps.push({
     phase: 'northwest',
-    title: 'Метод Северо-Западного угла — старт',
-    description: 'Начинаем с верхней левой (северо-западной) ячейки матрицы. ' +
-      'На каждом шаге распределяем максимально возможный объём и переходим вправо или вниз.',
+    title: isTkm ? 'Demirgazyk-Günbatar burç usuly — başlangyç' : 'Метод Северо-Западного угла — старт',
+    description: isTkm
+      ? 'Matrisanyň ýokarky çep (demirgazyk-günbatar) öýjüginden başlaýarys. Her ädimde mümkin bolan iň uly göwrümi paýlaýarys we saga ýa-da aşak geçýäris.'
+      : 'Начинаем с верхней левой (северо-западной) ячейки матрицы. На каждом шаге распределяем максимально возможный объём и переходим вправо или вниз.',
     table: deepCopy(plan),
     highlight: [],
   })
@@ -108,9 +114,9 @@ export function northWestCorner(
 
     steps.push({
       phase: 'northwest',
-      title: `СЗУ: ячейка (С${i + 1}, М${j + 1})`,
+      title: isTkm ? `DGB: öýjük (A${i + 1}, D${j + 1})` : `СЗУ: ячейка (С${i + 1}, М${j + 1})`,
       description: `x[${i + 1}][${j + 1}] = min(${s[i] + amount}, ${d[j] + amount}) = ${amount}. ` +
-        `Остаток склада С${i + 1}: ${s[i]}, потребность М${j + 1}: ${d[j]}.`,
+        (isTkm ? `A${i + 1} ammarynyň galyndysy: ${s[i]}, D${j + 1} dükanynyň islegi: ${d[j]}.` : `Остаток склада С${i + 1}: ${s[i]}, потребность М${j + 1}: ${d[j]}.`),
       table: deepCopy(plan),
       highlight: [{ i, j }],
     })
@@ -145,11 +151,13 @@ export function vogelMethod(
   const doneRows = new Set<number>()
   const doneCols = new Set<number>()
 
+  const isTkm = currentLocale.value === 'tkm'
   steps.push({
     phase: 'vogel',
-    title: 'Метод Фогеля — старт',
-    description: 'Для каждой строки и столбца вычисляем штраф = разность между двумя минимальными стоимостями. ' +
-      'Выбираем строку/столбец с наибольшим штрафом и заполняем ячейку с минимальной стоимостью.',
+    title: isTkm ? 'Fogel usuly — başlangyç' : 'Метод Фогеля — старт',
+    description: isTkm
+      ? 'Her hatar we sütün üçin jerime hasaplaýarys = iki iň kiçi bahanyň arasyndaky tapawut. Iň uly jerimeli hatary/sütüni saýlaýarys we iň kiçi bahaly öýjügi doldurýarys.'
+      : 'Для каждой строки и столбца вычисляем штраф = разность между двумя минимальными стоимостями. Выбираем строку/столбец с наибольшим штрафом и заполняем ячейку с минимальной стоимостью.',
     table: deepCopy(plan),
     highlight: [],
   })
@@ -204,13 +212,14 @@ export function vogelMethod(
     d[chosenJ] -= amount
 
     const penSrc = maxRow.pen >= maxCol.pen
-      ? `Штраф строки С${chosenI + 1} = ${maxRow.pen} (максимальный)`
-      : `Штраф столбца М${chosenJ + 1} = ${maxCol.pen} (максимальный)`
+      ? (isTkm ? `A${chosenI + 1} hatarynyň jerimesi = ${maxRow.pen} (iň uly)` : `Штраф строки С${chosenI + 1} = ${maxRow.pen} (максимальный)`)
+      : (isTkm ? `D${chosenJ + 1} sütüniň jerimesi = ${maxCol.pen} (iň uly)` : `Штраф столбца М${chosenJ + 1} = ${maxCol.pen} (максимальный)`)
 
     steps.push({
       phase: 'vogel',
-      title: `Фогель: ячейка (С${chosenI + 1}, М${chosenJ + 1})`,
-      description: `${penSrc}. Минимальная стоимость c[${chosenI + 1}][${chosenJ + 1}] = ${costs[chosenI][chosenJ]}. ` +
+      title: isTkm ? `Fogel: öýjük (A${chosenI + 1}, D${chosenJ + 1})` : `Фогель: ячейка (С${chosenI + 1}, М${chosenJ + 1})`,
+      description: `${penSrc}. ` +
+        (isTkm ? `Iň kiçi baha c[${chosenI + 1}][${chosenJ + 1}] = ${costs[chosenI][chosenJ]}. ` : `Минимальная стоимость c[${chosenI + 1}][${chosenJ + 1}] = ${costs[chosenI][chosenJ]}. `) +
         `x[${chosenI + 1}][${chosenJ + 1}] = min(${s[chosenI] + amount}, ${d[chosenJ] + amount}) = ${amount}.`,
       table: deepCopy(plan),
       highlight: [{ i: chosenI, j: chosenJ }],
@@ -297,12 +306,13 @@ export function potentialsMethod(
   let plan = deepCopy(initialPlan)
   let iterations = 0
 
+  const isTkm = currentLocale.value === 'tkm'
   steps.push({
     phase: 'potentials',
-    title: 'Метод потенциалов — начало',
-    description: 'Для каждой итерации: 1) вычисляем потенциалы u[i], v[j], ' +
-      '2) находим оценки свободных клеток δ[i][j] = c[i][j] − u[i] − v[j], ' +
-      '3) если все δ ≥ 0 — план оптимален; иначе строим цикл пересчёта.',
+    title: isTkm ? 'Potensiallar usuly — başlangyç' : 'Метод потенциалов — начало',
+    description: isTkm
+      ? 'Her iterasiýa üçin: 1) u[i], v[j] potensiallaryny hasaplaýarys, 2) boş öýjükleriň bahalaryny tapýarys δ[i][j] = c[i][j] − u[i] − v[j], 3) eger ähli δ ≥ 0 bolsa — meýilnama optimal; ýogsam täzeden hasaplamak üçin sikl gurýarys.'
+      : 'Для каждой итерации: 1) вычисляем потенциалы u[i], v[j], 2) находим оценки свободных клеток δ[i][j] = c[i][j] − u[i] − v[j], 3) если все δ ≥ 0 — план оптимален; иначе строим цикл пересчёта.',
     table: deepCopy(plan),
   })
 
@@ -331,8 +341,10 @@ export function potentialsMethod(
     if (enterI === -1) {
       steps.push({
         phase: 'potentials',
-        title: `Итерация ${iterations}: Решение оптимально ✓`,
-        description: `Потенциалы: ${uStr}; ${vStr}.\nВсе оценки свободных клеток ≥ 0. Оптимум достигнут!`,
+        title: isTkm ? `Iterasiýa ${iterations}: Çözgüt optimal ✓` : `Итерация ${iterations}: Решение оптимально ✓`,
+        description: isTkm 
+          ? `Potensiallar: ${uStr}; ${vStr}.\nÄhli boş öýjükleriň bahalary ≥ 0. Optima ýetildi!`
+          : `Потенциалы: ${uStr}; ${vStr}.\nВсе оценки свободных клеток ≥ 0. Оптимум достигнут!`,
         table: deepCopy(plan),
         highlight: [],
       })
@@ -344,8 +356,10 @@ export function potentialsMethod(
     if (!loop || loop.length < 4) {
       steps.push({
         phase: 'potentials',
-        title: `Итерация ${iterations}: Вырожденный случай`,
-        description: `Цикл пересчёта не построен. Отрицательные оценки: ${deltas.join(', ')}.`,
+        title: isTkm ? `Iterasiýa ${iterations}: Bozulma ýagdaýy` : `Итерация ${iterations}: Вырожденный случай`,
+        description: isTkm
+          ? `Täzeden hasaplamak sikli gurlup bilinmedi. Otrisatel bahalar: ${deltas.join(', ')}.`
+          : `Цикл пересчёта не построен. Отрицательные оценки: ${deltas.join(', ')}.`,
         table: deepCopy(plan),
       })
       break
@@ -361,10 +375,10 @@ export function potentialsMethod(
 
     steps.push({
       phase: 'potentials',
-      title: `Итерация ${iterations}: Пересчёт`,
-      description: `Потенциалы: ${uStr}; ${vStr}.\n` +
-        `Минимальная оценка: δ(С${enterI + 1},М${enterJ + 1}) = ${minDelta} < 0.\n` +
-        `Цикл: ${loopStr}. Θ = ${theta}.`,
+      title: isTkm ? `Iterasiýa ${iterations}: Täzeden hasaplamak` : `Итерация ${iterations}: Пересчёт`,
+      description: isTkm
+        ? `Potensiallar: ${uStr}; ${vStr}.\nIň kiçi baha: δ(A${enterI + 1},D${enterJ + 1}) = ${minDelta} < 0.\nSikl: ${loopStr}. Θ = ${theta}.`
+        : `Потенциалы: ${uStr}; ${vStr}.\nМинимальная оценка: δ(С${enterI + 1},М${enterJ + 1}) = ${minDelta} < 0.\nЦикл: ${loopStr}. Θ = ${theta}.`,
       table: deepCopy(plan),
       highlight: loop,
     })
@@ -382,13 +396,15 @@ export function potentialsMethod(
 // ─── Главная функция ──────────────────────────────────────────────────────────
 
 export function solveTransport(problem: TransportProblem): TransportSolution {
+  const isTkm = currentLocale.value === 'tkm'
   const steps: SolveStep[] = []
 
   steps.push({
     phase: 'balance',
-    title: 'Постановка задачи',
-    description: `Складов: ${problem.supply.length}, Магазинов: ${problem.demand.length}. ` +
-      `Суммарные запасы: ${sumArr(problem.supply)}, Суммарные потребности: ${sumArr(problem.demand)}.`,
+    title: isTkm ? 'Meseläniň goýluşy' : 'Постановка задачи',
+    description: isTkm
+      ? `Ammarlar: ${problem.supply.length}, Dükanlar: ${problem.demand.length}. Umumy ätiýaçlyklar: ${sumArr(problem.supply)}, Umumy islegler: ${sumArr(problem.demand)}.`
+      : `Складов: ${problem.supply.length}, Магазинов: ${problem.demand.length}. Суммарные запасы: ${sumArr(problem.supply)}, Суммарные потребности: ${sumArr(problem.demand)}.`,
   })
 
   const { supply, demand, costs, fictitious, fictitiousType, fictitiousIndex } =
@@ -403,8 +419,8 @@ export function solveTransport(problem: TransportProblem): TransportSolution {
   const nwCost = calcCost(nwPlan, costs, n, m)
   nwSteps.push({
     phase: 'northwest',
-    title: 'Итог: Метод СЗУ',
-    description: `Начальный план (СЗУ) построен. Стоимость: ${nwCost}.`,
+    title: isTkm ? 'Netije: DGB usuly' : 'Итог: Метод СЗУ',
+    description: isTkm ? `Başlangyç meýilnama (DGB) gurlupdy. Bahasy: ${nwCost}.` : `Начальный план (СЗУ) построен. Стоимость: ${nwCost}.`,
     table: deepCopy(nwPlan),
     highlight: [],
   })
@@ -415,9 +431,10 @@ export function solveTransport(problem: TransportProblem): TransportSolution {
   const vogelCost = calcCost(vogelPlan, costs, n, m)
   vogelSteps.push({
     phase: 'vogel',
-    title: 'Итог: Метод Фогеля',
-    description: `Начальный план (Фогель) построен. Стоимость: ${vogelCost}. ` +
-      `${vogelCost < nwCost ? `Улучшение на ${nwCost - vogelCost} по сравнению с СЗУ.` : 'Стоимость сравнима с СЗУ.'}`,
+    title: isTkm ? 'Netije: Fogel usuly' : 'Итог: Метод Фогеля',
+    description: isTkm
+      ? `Başlangyç meýilnama (Fogel) gurlupdy. Bahasy: ${vogelCost}. ${vogelCost < nwCost ? `DGB usulyna garanyňda ${nwCost - vogelCost} gowulanma.` : 'Baha DGB usulyna meňzeş.'}`
+      : `Начальный план (Фогель) построен. Стоимость: ${vogelCost}. ${vogelCost < nwCost ? `Улучшение на ${nwCost - vogelCost} по сравнению с СЗУ.` : 'Стоимость сравнима с СЗУ.'}`,
     table: deepCopy(vogelPlan),
     highlight: [],
   })
@@ -441,10 +458,10 @@ export function solveTransport(problem: TransportProblem): TransportSolution {
 
   steps.push({
     phase: 'result',
-    title: '✅ Оптимальный план перевозок',
-    description: `Минимальная суммарная стоимость: ${totalCost}.\n` +
-      `СЗУ: ${nwCost} → Фогель: ${vogelCost} → Оптимум: ${totalCost}.\n` +
-      `Итераций метода потенциалов: ${iterations}.`,
+    title: isTkm ? '✅ Iň oňat daşamagy meýilnamasy' : '✅ Оптимальный план перевозок',
+    description: isTkm
+      ? `Iň az umumy baha: ${totalCost}.\nDGB: ${nwCost} → Fogel: ${vogelCost} → Iň oňat: ${totalCost}.\nPotensiallar usulynyň iterasiýalary: ${iterations}.`
+      : `Минимальная суммарная стоимость: ${totalCost}.\nСЗУ: ${nwCost} → Фогель: ${vogelCost} → Оптимум: ${totalCost}.\nИтераций метода потенциалов: ${iterations}.`,
     table: optPlan.slice(0, realN).map(row => row.slice(0, realM)),
     highlight: [],
   })

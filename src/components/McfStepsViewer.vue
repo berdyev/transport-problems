@@ -22,12 +22,12 @@
 
       <button class="ctrl-btn play-btn" :class="{ playing: isPlaying }" @click="togglePlay">
         {{ isPlaying ? '⏸' : '▶️' }}
-        <span>{{ isPlaying ? 'Пауза' : 'Авто' }}</span>
+        <span>{{ isPlaying ? t('sv.pause') : t('sv.auto') }}</span>
       </button>
       <select class="speed-select" v-model.number="playSpeed">
-        <option :value="2000">Медленно</option>
-        <option :value="1000">Нормально</option>
-        <option :value="500">Быстро</option>
+        <option :value="2000">{{ t('sv.slow') }}</option>
+        <option :value="1000">{{ t('sv.normal') }}</option>
+        <option :value="500">{{ t('sv.fast') }}</option>
       </select>
     </div>
 
@@ -38,7 +38,7 @@
         <transition name="fade" mode="out-in">
           <div class="step-card card" :key="currentStepIdx" v-if="currentStep">
             <div class="step-header">
-              <span class="step-phase-badge">Шаг {{ currentStep.stepIndex }}</span>
+              <span class="step-phase-badge">{{ t('sv.step_badge') }} {{ currentStep.stepIndex }}</span>
               <h3 class="step-title">{{ currentStep.title }}</h3>
             </div>
 
@@ -48,15 +48,15 @@
 
             <!-- Таблица текущих потоков -->
             <div class="table-container">
-              <h4 class="table-title">Загрузка каналов связи</h4>
+              <h4 class="table-title">{{ t('sv4.channels') }}</h4>
               <table class="mcf-table">
                 <thead>
                   <tr>
-                    <th>Канал</th>
-                    <th>Стоимость c</th>
-                    <th>Пропускная u</th>
-                    <th>Текущий поток f</th>
-                    <th>Состояние</th>
+                    <th>{{ t('sv4.col_channel') }}</th>
+                    <th>{{ t('sv4.col_cost') }}</th>
+                    <th>{{ t('sv4.col_cap') }}</th>
+                    <th>{{ t('sv4.col_flow') }}</th>
+                    <th>{{ t('sv4.col_state') }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -75,12 +75,12 @@
                       <span
                         v-if="(currentStep.flows[edge.id] ?? 0) === edge.capacity"
                         class="badge bg-red"
-                      >Заполнен полностью</span>
+                      >{{ t('sv4.full') }}</span>
                       <span
                         v-else-if="(currentStep.flows[edge.id] ?? 0) > 0"
                         class="badge bg-blue"
-                      >Частично загружен</span>
-                      <span v-else class="badge bg-gray">Пустой</span>
+                      >{{ t('sv4.partial') }}</span>
+                      <span v-else class="badge bg-gray">{{ t('sv4.empty') }}</span>
                     </td>
                   </tr>
                 </tbody>
@@ -93,11 +93,11 @@
       <!-- Правая колонка: Визуализация -->
       <div class="step-visual-pane card">
         <div class="pane-header">
-          <span class="pane-title">Карта потоков</span>
+          <span class="pane-title">{{ t('sv4.flow_map') }}</span>
           <div class="visual-legend">
-            <span class="leg-dot bg-green"></span> Путь
-            <span class="leg-dot bg-blue"></span> Поток
-            <span class="leg-dot bg-gray"></span> Резерв
+            <span class="leg-dot bg-green"></span> {{ t('sv4.leg_path') }}
+            <span class="leg-dot bg-blue"></span> {{ t('sv4.leg_flow') }}
+            <span class="leg-dot bg-gray"></span> {{ t('sv4.leg_reserve') }}
           </div>
         </div>
 
@@ -238,6 +238,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onUnmounted, watch } from 'vue'
+import { t } from '../locale'
 import type { McfNode, McfEdge, McfStep } from '../core/mincostflow'
 
 const props = defineProps<{
