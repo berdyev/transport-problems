@@ -4,7 +4,7 @@
     <div class="card dim-card">
       <div class="dim-row">
         <div class="dim-group">
-          <label>Количество складов (n)</label>
+          <label>{{ t('tmat.n_suppliers') }}</label>
           <div class="dim-controls">
             <button class="btn btn-ghost dim-btn" @click="changeSuppliers(-1)" :disabled="nSuppliers <= 2">−</button>
             <span class="dim-val">{{ nSuppliers }}</span>
@@ -13,7 +13,7 @@
         </div>
         <div class="dim-divider"></div>
         <div class="dim-group">
-          <label>Количество магазинов (m)</label>
+          <label>{{ t('tmat.n_consumers') }}</label>
           <div class="dim-controls">
             <button class="btn btn-ghost dim-btn" @click="changeConsumers(-1)" :disabled="nConsumers <= 2">−</button>
             <span class="dim-val">{{ nConsumers }}</span>
@@ -21,9 +21,9 @@
           </div>
         </div>
         <div class="dim-actions">
-          <button class="btn btn-ghost" @click="fillExample">Пример</button>
-          <button class="btn btn-ghost" @click="fillRandom">Случайные</button>
-          <button class="btn btn-ghost" @click="clearAll">Очистить</button>
+          <button class="btn btn-ghost" @click="fillExample">{{ t('tmat.example') }}</button>
+          <button class="btn btn-ghost" @click="fillRandom">{{ t('tmat.random') }}</button>
+          <button class="btn btn-ghost" @click="clearAll">{{ t('tmat.clear') }}</button>
         </div>
       </div>
     </div>
@@ -38,7 +38,7 @@
           <span class="col-label consumer-label">М{{ j }}</span>
         </div>
         <div class="mh-supply-head">
-          <span>Запас (a<sub>i</sub>)</span>
+          <span>{{ t('tmat.supply_head') }}</span>
         </div>
       </div>
 
@@ -71,7 +71,7 @@
       <!-- Потребности -->
       <div class="demand-row">
         <div class="demand-label-cell">
-          <span class="text-dim small-label">Потребность (b<sub>j</sub>)</span>
+          <span class="text-dim small-label">{{ t('tmat.demand_head') }}</span>
         </div>
         <div v-for="(_, j) in nConsumers" :key="`dem-${j}`" class="demand-cell">
           <input
@@ -110,7 +110,7 @@
           <polygon points="5 3 19 12 5 21 5 3"/>
         </svg>
         <span v-if="solving" class="spinner"></span>
-        {{ solving ? 'Решаем...' : 'Решить задачу' }}
+        {{ solving ? t('tmat.solving') : t('tmat.solve') }}
       </button>
     </div>
   </div>
@@ -118,6 +118,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { t } from '../locale'
 import type { TransportProblem } from '../core/types'
 
 const emit = defineEmits<{
@@ -176,17 +177,17 @@ const balanceClass = computed(() => {
 const balanceLabel = computed(() => {
   if (totalSupply.value === 0 && totalDemand.value === 0) return '—'
   if (balanceDiff.value === 0) return `∑=${totalSupply.value} ✓`
-  if (balanceDiff.value > 0) return `Избыток`
-  return `Дефицит`
+  if (balanceDiff.value > 0) return t('tmat.balance_surplus')
+  return t('tmat.balance_deficit')
 })
 
 const validationError = computed(() => {
-  if (totalSupply.value <= 0) return 'Введите запасы складов'
-  if (totalDemand.value <= 0) return 'Введите потребности магазинов'
-  if (supply.value.some(s => !s || s <= 0)) return 'Все запасы должны быть > 0'
-  if (demand.value.some(d => !d || d <= 0)) return 'Все потребности должны быть > 0'
+  if (totalSupply.value <= 0) return t('tmat.err_supply')
+  if (totalDemand.value <= 0) return t('tmat.err_demand')
+  if (supply.value.some(s => !s || s <= 0)) return t('tmat.err_supply_pos')
+  if (demand.value.some(d => !d || d <= 0)) return t('tmat.err_demand_pos')
   const hasNegCost = costs.value.some(row => row.some(c => c < 0))
-  if (hasNegCost) return 'Стоимости не могут быть отрицательными'
+  if (hasNegCost) return t('tmat.err_neg_cost')
   return null
 })
 

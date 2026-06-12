@@ -38,12 +38,12 @@
 
       <button class="ctrl-btn play-btn" :class="{ playing: isPlaying }" @click="togglePlay">
         {{ isPlaying ? '⏸' : '▶️' }}
-        <span>{{ isPlaying ? 'Пауза' : 'Авто' }}</span>
+        <span>{{ isPlaying ? t('sv.pause') : t('sv.auto') }}</span>
       </button>
       <select class="speed-select" v-model.number="playSpeed">
-        <option :value="2000">Медленно</option>
-        <option :value="1000">Нормально</option>
-        <option :value="500">Быстро</option>
+        <option :value="2000">{{ t('sv.slow') }}</option>
+        <option :value="1000">{{ t('sv.normal') }}</option>
+        <option :value="500">{{ t('sv.fast') }}</option>
       </select>
     </div>
 
@@ -109,6 +109,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onUnmounted, watch } from 'vue'
+import { t } from '../locale'
 import type { SolveStep, StepPhase } from '../core/types'
 
 const props = defineProps<{
@@ -118,12 +119,12 @@ const props = defineProps<{
 type PhaseTabId = StepPhase | 'all'
 
 const phaseTabs: { id: PhaseTabId; label: string; icon: string; color: string }[] = [
-  { id: 'all',        label: 'Все шаги',        icon: '📋', color: '#a0aec0' },
-  { id: 'balance',    label: 'Баланс',           icon: '⚖️', color: '#a0aec0' },
-  { id: 'northwest',  label: 'Сев.-зап. угол',   icon: '🧭', color: '#f6ad55' },
-  { id: 'vogel',      label: 'Метод Фогеля',     icon: '🦅', color: '#9f7aea' },
-  { id: 'potentials', label: 'Потенциалы',       icon: '⚡', color: '#63b3ed' },
-  { id: 'result',     label: 'Результат',        icon: '✅', color: '#2cb67d' },
+  { id: 'all',        label: t('sv1.all'),        icon: '📋', color: '#a0aec0' },
+  { id: 'balance',    label: t('sv1.balance'),    icon: '⚖️', color: '#a0aec0' },
+  { id: 'northwest',  label: t('sv1.nw'),         icon: '🧭', color: '#f6ad55' },
+  { id: 'vogel',      label: t('sv1.vogel'),      icon: '🦅', color: '#9f7aea' },
+  { id: 'potentials', label: t('sv1.potentials'), icon: '⚡', color: '#63b3ed' },
+  { id: 'result',     label: t('sv1.result'),     icon: '✅', color: '#2cb67d' },
 ]
 
 const activePhase = ref<PhaseTabId>('all')
@@ -191,11 +192,11 @@ function phaseColor(phase: StepPhase): string {
 
 function phaseLabel(phase: StepPhase): string {
   const map: Record<StepPhase, string> = {
-    balance:    'Баланс',
-    northwest:  'СЗУ',
-    vogel:      'Фогель',
-    potentials: 'Потенциалы',
-    result:     'Результат',
+    balance:    t('sv1.phase_balance'),
+    northwest:  t('sv1.phase_nw'),
+    vogel:      t('sv1.phase_vogel'),
+    potentials: t('sv1.phase_potentials'),
+    result:     t('sv1.phase_result'),
   }
   return map[phase] ?? phase
 }

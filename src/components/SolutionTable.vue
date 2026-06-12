@@ -3,21 +3,21 @@
     <!-- Сводка -->
     <div class="summary-grid">
       <div class="summary-card card nw-card">
-        <div class="sc-label">Метод СЗУ</div>
+        <div class="sc-label">{{ t('st.nw_label') }}</div>
         <div class="sc-cost">{{ solution.nwCost }}</div>
-        <div class="sc-sub">Начальная стоимость</div>
+        <div class="sc-sub">{{ t('st.nw_sub') }}</div>
       </div>
       <div class="arrow-cell">→</div>
       <div class="summary-card card vogel-card">
-        <div class="sc-label">Метод Фогеля</div>
+        <div class="sc-label">{{ t('st.vogel_label') }}</div>
         <div class="sc-cost">{{ solution.vogelCost }}</div>
-        <div class="sc-sub">Улучшенное начало</div>
+        <div class="sc-sub">{{ t('st.vogel_sub') }}</div>
       </div>
       <div class="arrow-cell">→</div>
       <div class="summary-card card opt-card">
-        <div class="sc-label">Оптимум</div>
+        <div class="sc-label">{{ t('st.opt_label') }}</div>
         <div class="sc-cost highlight-cost">{{ solution.totalCost }}</div>
-        <div class="sc-sub">Метод потенциалов ({{ solution.iterations }} ит.)</div>
+        <div class="sc-sub">{{ t('st.opt_sub') }} ({{ solution.iterations }} {{ t('st.iter') }})</div>
       </div>
     </div>
 
@@ -28,9 +28,11 @@
         <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
       </svg>
       <span>
-        Задача была несбалансированной. Добавлен фиктивный
-        {{ solution.fictitiousType === 'consumer' ? `магазин М${(solution.fictitiousIndex ?? 0) + 1}` : `склад С${(solution.fictitiousIndex ?? 0) + 1}` }}.
-        Перевозки на него в плане не учитываются.
+        {{ t('st.fictitious_msg') }}
+        {{ solution.fictitiousType === 'consumer'
+          ? `${t('st.fictitious_consumer')} М${(solution.fictitiousIndex ?? 0) + 1}`
+          : `${t('st.fictitious_supplier')} С${(solution.fictitiousIndex ?? 0) + 1}` }}.
+        {{ t('st.fictitious_end') }}
       </span>
     </div>
 
@@ -39,7 +41,7 @@
       <div class="plan-block card">
         <div class="plan-title nw-title">
           <span class="plan-badge nw-badge">СЗУ</span>
-          <span>Северо-западный угол</span>
+          <span>{{ t('st.nw_full') }}</span>
           <span class="plan-cost">{{ solution.nwCost }}</span>
         </div>
         <div class="plan-table-wrap">
@@ -50,7 +52,7 @@
       <div class="plan-block card">
         <div class="plan-title vogel-title">
           <span class="plan-badge vogel-badge">Фогель</span>
-          <span>Метод Фогеля</span>
+          <span>{{ t('st.vogel_full') }}</span>
           <span class="plan-cost">{{ solution.vogelCost }}</span>
         </div>
         <div class="plan-table-wrap">
@@ -60,8 +62,8 @@
 
       <div class="plan-block card opt-block">
         <div class="plan-title opt-title">
-          <span class="plan-badge opt-badge">Оптимум ✓</span>
-          <span>Метод потенциалов</span>
+          <span class="plan-badge opt-badge">✓</span>
+          <span>{{ t('st.opt_full') }}</span>
           <span class="plan-cost opt-cost">{{ solution.totalCost }}</span>
         </div>
         <div class="plan-table-wrap">
@@ -72,15 +74,15 @@
 
     <!-- Таблица перевозок -->
     <div class="card allocation-card">
-      <h4 class="alloc-title">Оптимальный план перевозок</h4>
+      <h4 class="alloc-title">{{ t('st.alloc_title') }}</h4>
       <table class="alloc-table">
         <thead>
           <tr>
-            <th>Маршрут</th>
-            <th>Склад → Магазин</th>
-            <th>Стоимость</th>
-            <th>Объём</th>
-            <th>Сумма</th>
+            <th>{{ t('st.col_route') }}</th>
+            <th>{{ t('st.col_direction') }}</th>
+            <th>{{ t('st.col_cost') }}</th>
+            <th>{{ t('st.col_volume') }}</th>
+            <th>{{ t('st.col_sum') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -98,7 +100,7 @@
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="4" class="total-label">Итоговая стоимость</td>
+            <td colspan="4" class="total-label">{{ t('st.total') }}</td>
             <td class="total-val">{{ solution.totalCost }}</td>
           </tr>
         </tfoot>
@@ -109,6 +111,7 @@
 
 <script setup lang="ts">
 import type { TransportSolution } from '../core/types'
+import { t } from '../locale'
 import PlanTable from './PlanTable.vue'
 
 defineProps<{ solution: TransportSolution }>()

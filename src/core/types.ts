@@ -50,3 +50,34 @@ export interface TransportSolution {
 }
 
 export type TaskTab = 1 | 2 | 3 | 4
+
+// ============================================================
+// Типы для задачи коммивояжера (TSP)
+// ============================================================
+
+export interface TspProblem {
+  matrix: number[][]
+}
+
+export interface TspStep {
+  stepIndex: number
+  title: string
+  description: string
+  matrix: number[][]
+  crossedRows: number[]
+  crossedCols: number[]
+  penalties?: (number | null)[][]
+  rowMinima?: number[]
+  colMinima?: number[]
+  selectedEdge?: { i: number; j: number; penalty: number } | null
+  currentPath: { i: number; j: number }[]
+  lowerBound: number
+}
+
+export interface TspSolution {
+  edges: { i: number; j: number }[]
+  path: number[]
+  totalCost: number
+  steps: TspStep[]
+}
+
